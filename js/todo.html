@@ -13,10 +13,10 @@
 				<li each={ getTodos(curFilterState) } class={ completed: completed, editing: editing }>
 					<div class="view">
 						<input class="toggle" type="checkbox" checked={ completed } onclick={ parent.toggleTodo }>
-						<label>{ title }</label>
+						<label ondblclick={ parent.editTodo }>{ title }</label>
 						<button class="destroy" onclick={ parent.removeTodo }></button>
 					</div>
-					<input class="edit" value="Create a TodoMVC template">
+					<input class="edit" onkeyup={ parent.editKeyUp } onblur={ parent.doneEdit }>
 				</li>
 			</ul>
 		</section>
@@ -37,12 +37,17 @@
 
 	<!-- logic here -->
 	<script>
+		// A todo item has three possible interactions:
+
+		// 1. Clicking the checkbox marks the todo as complete by updating its completed value and toggling the class completed on its parent <li>
+		// 2. Double-clicking the <label> activates editing mode, by toggling the .editing class on its <li>
+		// 3. Hovering over the todo shows the remove button (.destroy)
+
 		this.todos = [];
 		this.filters = [ { state: "all", href: "#/" },
 			{ state: "active", href: "#/active" },
 			{ state: "completed", href: "#/completed"} ];
 		this.curFilterState = "all";
-		// this.flicker = false;	// for test
 
 		// alias
 		var self = this;
@@ -67,9 +72,8 @@
 			if (e.which == 13) {
 				var value = e.target.value && e.target.value.trim();
 				if (value) {
-					self.todos.push({ title: value, completed: false });
+					self.todos.push({ title: value, completed: false, editing: false });
 					e.target.value = '';
-					// self.flicker = !self.flicker;	// for test
 				}
 			};
 		}
@@ -126,6 +130,30 @@
 			self.todos.forEach(function(i) {
 				i.completed = checked;
 			})
+		}
+
+		// When editing mode is activated it will hide the other controls and bring forward an input that contains the todo title, which should be focused (.focus()). The edit should be saved on both blur and enter, and the editing class should be removed. Make sure to .trim() the input and then check that it's not empty. If it's empty the todo should instead be destroyed. If escape is pressed during the edit, the edit state should be left and any changes be discarded.
+		editTodo(e) {
+			var input = e.target.parentNode.parentNode.children[1];
+			input.value = e.item.title;
+			e.item.editing = true;
+			self.update();	// must update first
+			input.focus();	// otherwise focus() does not work (as it's still below the <div>)
+		}
+
+		editKeyUp(e) {
+			if (e.which == 13) {
+				e.item.title = e.target.value;
+				e.item.editing = false;
+			} else if (e.which == 27) {				
+				e.target.value = e.item.title;
+				e.item.editing = false;
+			}
+		}
+
+		doneEdit(e) {
+			e.item.title = e.target.value;
+			e.item.editing = false;
 		}
 
 		// for debug
