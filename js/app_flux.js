@@ -89,6 +89,12 @@
 	var my_todos = new TodoStores();
 	Dispatcher.register(my_todos);
 
+	// routing, consider it another store (handled by browser & Riot)
+	// thus no need to register
+	riot.route(function(dummy, state) {
+		Controller.trigger("routing", state);
+	});
+
 	// Your starting point. Enjoy the ride!
 	var my_todos_tag = riot.mount('my-todo');
 

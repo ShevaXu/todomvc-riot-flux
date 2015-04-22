@@ -49,18 +49,6 @@
 		Dispatcher = window.Dispatcher;
 		Controller = window.Controller;
 
-		riot.route.exec(function(dummy, state) {
-			// the arguments are always ["", state]			
-			self.curFilterState = state || "all";
-			self.update();
-		})
-
-		// url changes
-		riot.route(function(dummy, state) {
-			self.curFilterState = state;
-			self.update();	// have to call update manually
-		})
-
 		//////////////////////////
 		// action that would change the todo store
 		//////////////////////////
@@ -68,7 +56,6 @@
 			if (e.which == 13) {
 				var value = e.target.value && e.target.value.trim();
 				if (value) {
-					// self.todos.push({ title: value, completed: false, editing: false });
 					Dispatcher.trigger("direct", "todo_add", { title: value });
 					e.target.value = '';
 				}
@@ -160,6 +147,11 @@
 				t.editing = false;
 			});
 			self.todos = data;
+		});
+
+		Controller.on("routing", function(state) {
+			self.curFilterState = state || "all";
+			self.update();
 		});
 
 		// for debug
