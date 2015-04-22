@@ -143,8 +143,7 @@
 
 		editKeyUp(e) {
 			if (e.which == 13) {
-				e.item.title = e.target.value;
-				e.item.editing = false;
+				self.doneEdit(e);
 			} else if (e.which == 27) {				
 				e.target.value = e.item.title;
 				e.item.editing = false;
@@ -152,8 +151,14 @@
 		}
 
 		doneEdit(e) {
-			e.item.title = e.target.value;
-			e.item.editing = false;
+			var item = e.item;
+			item.editing = false;
+			var value = e.target.value && e.target.value.trim();
+			if (value) {
+				e.item.title = value;
+			} else {
+				self.removeTodo(e);
+			}
 		}
 
 		// for debug
