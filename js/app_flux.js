@@ -1,22 +1,6 @@
 (function (window) {
 	'use strict';
 
-	window.Dispatcher = riot.observable();
-	// should consider it private later
-	Dispatcher.stores = [];
-
-	Dispatcher.register = function(store) {
-		this.stores.push(store);
-	}
-
-	Dispatcher.on("direct", function(type, data) {
-		this.stores.forEach(function(s) {
-			s.callback(type, data);
-		});
-	});
-
-	window.Controller = riot.observable();	// just a bridge between stores and custom-tags/views
-
 	// the stores
 	var TodoStores = function() {
 		this.todos = [];

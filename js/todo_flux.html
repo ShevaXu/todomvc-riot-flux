@@ -46,7 +46,6 @@
 
 		// alias
 		var self = this;
-		Dispatcher = window.Dispatcher;
 		Controller = window.Controller;
 
 		//////////////////////////
@@ -56,29 +55,26 @@
 			if (e.which == 13) {
 				var value = e.target.value && e.target.value.trim();
 				if (value) {
-					Dispatcher.trigger("direct", "todo_add", { title: value });
+					Controller.direct("todo_add", { title: value });
 					e.target.value = '';
 				}
 			};
 		}
 
 		removeTodo(e) {
-			var item = e.item;
-			Dispatcher.trigger("direct", "todo_remove", { id: item.id });
+			Controller.direct("todo_remove", { id: e.item.id });
 		}
 
 		clearCompleted(e) {
-			Dispatcher.trigger("direct", "todo_clearCompleted");
+			Controller.direct("todo_clearCompleted");
 		}
 
 		toggleTodo(e) {
-			var item = e.item;
-			Dispatcher.trigger("direct", "todo_toggle", { id: item.id });
+			Controller.direct("todo_toggle", { id: e.item.id });
 		}
 
 		toggleAll(e) {
-			var checked = e.target.checked;
-			Dispatcher.trigger("direct", "todo_toggleAll", { completed: checked });
+			Controller.direct("todo_toggleAll", { completed: e.target.checked });
 		}
 
 		doneEdit(e) {
@@ -86,9 +82,9 @@
 			item.editing = false;
 			var value = e.target.value && e.target.value.trim();
 			if (value) {
-				Dispatcher.trigger("direct", "todo_edit", { id: item.id, title: value });
+				Controller.direct("todo_edit", { id: item.id, title: value });
 			} else {
-				Dispatcher.trigger("direct", "todo_remove", { id: item.id });
+				Controller.direct("todo_remove", { id: item.id });
 			}
 		}
 
