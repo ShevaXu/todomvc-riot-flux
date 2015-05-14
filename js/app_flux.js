@@ -9,12 +9,17 @@
 	}
 
 	TodoStores.prototype = {
+		changed: function() {
+			Controller.trigger(this.name, this.todos.slice());
+		},
 		callback: function(type, data) {
+			// console.log(this)
 			switch (type) {
 				case "todo_add":
+				// console.log(this)
 					var title = data.title;
 					this.todos.push({ id: this.count, title: title, completed: false});
-					Controller.trigger(this.name, this.todos.slice());
+					this.changed();
 					this.count++;
 					break;
 				case "todo_remove":
@@ -22,7 +27,7 @@
 					this.todos = this.todos.filter(function(t) {
 						return t.id != id;
 					});
-					Controller.trigger(this.name, this.todos.slice());
+					this.changed();
 					break;
 				case "todo_removeSome":
 					var ids = data.ids;
@@ -31,13 +36,13 @@
 							t.id == id;
 						});						
 					});
-					Controller.trigger(this.name, this.todos.slice());
+					this.changed();
 					break;
 				case "todo_clearCompleted":
 					this.todos = this.todos.filter(function(t) {
 						return !t.completed;					
 					});
-					Controller.trigger(this.name, this.todos.slice());
+					this.changed();
 					break;
 				case "todo_toggle":
 					var id = data.id;
@@ -45,14 +50,14 @@
 						if (t.id == id)
 							t.completed = !t.completed;
 					});
-					Controller.trigger(this.name, this.todos.slice());
+					this.changed();
 					break;
 				case "todo_toggleAll":
 					var completed = data.completed;
 					this.todos.forEach(function(t) {
 						t.completed = completed;
 					});
-					Controller.trigger(this.name, this.todos.slice());
+					this.changed();
 					break;
 				case "todo_edit":
 					var id = data.id;
@@ -61,7 +66,7 @@
 						if (t.id == id)
 							t.title = title;
 					});
-					Controller.trigger(this.name, this.todos.slice());
+					this.changed();
 					break;
 				default:
 					console.log("Do nothing for action " + type);
