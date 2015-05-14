@@ -1,26 +1,34 @@
 (function (window) {
 	'use strict';
 
+	// id helper
+	function guid() {
+	  function s4() {
+	    return Math.floor((1 + Math.random()) * 0x10000)
+	      .toString(16)
+	      .substring(1);
+	  }
+	  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+	    s4() + '-' + s4() + s4() + s4();
+	}
+
 	// the stores
-	var TodoStores = function() {
-		this.todos = [];
-		this.count = 0;	// for assign ids to todos
+	var TodoStores = function(todos) {
+		this.todos = todos || [];
 		this.name = "todos";
 	}
 
 	TodoStores.prototype = {
 		changed: function() {
+			localStorage.setItem("MY_TODO_STORAGE", JSON.stringify(this.todos));
 			Controller.trigger(this.name, this.todos.slice());
 		},
 		callback: function(type, data) {
-			// console.log(this)
 			switch (type) {
 				case "todo_add":
-				// console.log(this)
 					var title = data.title;
-					this.todos.push({ id: this.count, title: title, completed: false});
+					this.todos.push({ id: guid(), title: title, completed: false});
 					this.changed();
-					this.count++;
 					break;
 				case "todo_remove":
 					var id = data.id;
@@ -68,6 +76,9 @@
 					});
 					this.changed();
 					break;
+				case "todo_get":
+					Controller.trigger(this.name, this.todos.slice());
+					break;
 				default:
 					console.log("Do nothing for action " + type);
 					break;
@@ -75,7 +86,7 @@
 		}
 	}
 
-	var my_todos = new TodoStores();
+	var my_todos = new TodoStores(JSON.parse(localStorage.getItem("MY_TODO_STORAGE") || '[]'));
 	Dispatcher.register(my_todos);
 
 	// routing, consider it another store (handled by browser & Riot)
